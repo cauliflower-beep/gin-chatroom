@@ -123,12 +123,28 @@ cd go-chat
 go mod download
 ```
 
-MySQL创建数据库
+#### **MySQL**
+
+**创建数据库**
+
 ```mysql
 CREATE DATABASE chat;
 ```
 
-修改数据库配置文件
+原作者导出的sql文件版本较高，我直接运行的时候出现了以下报错：
+
+![image-20220210150435193](assets\image-20220210150435193.png)
+
+这是由于我本机mysql版本较低导致的不兼容。解决方法：
+
+- 创建数据库的时候，字符集选utf8，排序规则选utf8_general_ci；
+- 打开chat.sql，将utf8mb4全部替换为utf8，utf8mb4_0900_ai_ci全部替换为utf8_general_ci；
+- 重新运行chat.sql.
+
+有关utf8跟utf8mb4的区别，可自行查阅资料。
+
+修改配置文件
+
 ```shell
 vim config.toml
 
@@ -143,7 +159,16 @@ user = "root"
 修改用户名user，密码password等信息。
 ```
 
+toml语义显著且易于阅读，是一种低限度的配置文件格式。他主要有以下优点：
+
+1. 手工编辑配置，方便易读；
+2. 完全以配置为导向，专为处理配置项；
+3. 支持必要的数据类型和嵌套。
+
+[TOML 教程 - 可能是目前最好的配置文件格式 - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/50412485)
+
 创建表
+
 ```shell
 将chat.sql里面的sql语句复制到控制台创建对应的表。
 ```

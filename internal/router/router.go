@@ -11,6 +11,7 @@ import (
 )
 
 func NewRouter() *gin.Engine {
+	// 设置release编译模式，即发布版本，为用户使用，不包含调试信息
 	gin.SetMode(gin.ReleaseMode)
 
 	server := gin.Default()
