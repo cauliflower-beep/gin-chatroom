@@ -12,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// 注册
 func Login(c *gin.Context) {
 	var user model.User
 	// c.BindJSON(&user)
