@@ -33,6 +33,7 @@ func (u *userService) Register(user *model.User) error {
 	return nil
 }
 
+// 用户注册，数据保存进数据库
 func (u *userService) Login(user *model.User) bool {
 	pool.GetDB().AutoMigrate(&user)
 	log.Logger.Debug("user", log.Any("user in service", user))

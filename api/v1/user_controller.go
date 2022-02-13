@@ -16,9 +16,14 @@ import (
 func Login(c *gin.Context) {
 	var user model.User
 	// c.BindJSON(&user)
-	c.ShouldBindJSON(&user)
+	// 将注册参数与用户结构体绑定
+	err := c.ShouldBindJSON(&user)
+	if err != nil{
+		return
+	}
 	log.Logger.Debug("user", log.Any("user", user))
 
+	// 响应
 	if service.UserService.Login(&user) {
 		c.JSON(http.StatusOK, response.SuccessMsg(user))
 		return
