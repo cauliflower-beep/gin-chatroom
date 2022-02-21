@@ -7,6 +7,7 @@ doc/blueprint/
 *.iml
 *.swp
 *.log
+config.toml
 coverage.*
 y.output
 

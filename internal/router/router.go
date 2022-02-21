@@ -21,6 +21,17 @@ func NewRouter() *gin.Engine {
 
 	socket := RunSocekt
 
+	// 用户组
+	//usergroup := server.Group("/user")
+	//{
+	//	usergroup.GET("", v1.GetUserList)
+	//	usergroup.GET("/:uuid", v1.GetUserDetails)
+	//	usergroup.GET("/name", v1.GetUserOrGroupByName)
+	//	usergroup.POST("/register", v1.Register)
+	//	usergroup.POST("/login", v1.Login)
+	//	usergroup.PUT("", v1.ModifyUserInfo)
+	//}
+
 	group := server.Group("")
 	{
 		group.GET("/user", v1.GetUserList)
@@ -29,7 +40,6 @@ func NewRouter() *gin.Engine {
 		group.POST("/user/register", v1.Register)
 		group.POST("/user/login", v1.Login)
 		group.PUT("/user", v1.ModifyUserInfo)
-
 		group.POST("/friend", v1.AddFriend)
 
 		group.GET("/message", v1.GetMessage)
