@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// 用户结构
 type User struct {
 	Id       int32      `json:"id" gorm:"primary_key;AUTO_INCREMENT;comment:'id'"`
 	Uuid     string     `json:"uuid" gorm:"type:varchar(150);not null;unique_index:idx_uuid;comment:'uuid'"`
