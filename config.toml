@@ -7,6 +7,9 @@ password = "1314lsx"
 port = 3306
 tablePrefix = ""
 user = "root"
+timeout = "10s"
+maxconns = 100
+maxidle  = 20
 
 [log]
 level = "debug"

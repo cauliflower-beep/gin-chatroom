@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/spf13/viper"
 )
@@ -22,6 +23,9 @@ type MySQLConfig struct {
 	Port        int
 	TablePrefix string
 	User        string
+	Timeout     string
+	MaxConns    int // 最大连接数
+	MaxIdle     int // 最大空闲连接数
 }
 
 // 日志保存地址
@@ -46,12 +50,14 @@ type MsgChannelType struct {
 
 var c TomlConfig
 
+var one sync.Once
+
 func init() {
 	// 设置文件名
 	viper.SetConfigName("config")
 	// 设置文件类型
 	viper.SetConfigType("toml")
-	// 设置文件路径，可以多个viper会根据设置顺序依次查找
+	// 设置文件路径，可以有多个路径，viper会根据设置顺序依次查找
 	viper.AddConfigPath(".")
 	viper.AutomaticEnv()
 	err := viper.ReadInConfig()
@@ -61,6 +67,32 @@ func init() {
 
 	viper.Unmarshal(&c)
 }
+
 func GetConfig() TomlConfig {
+	return c
+}
+
+// 懒汉模式
+// 注意结构体判空
+func GetConfigLazy() TomlConfig {
+	if c == (TomlConfig{}) {
+		one.Do(func() {
+			//1. 设置文件名
+			viper.SetConfigName("config")
+			//2. 确定配置文件类型
+			viper.SetConfigType("toml")
+			//3. 设置配置文件路径
+			viper.AddConfigPath(".")
+			//4. 匹配环境变量
+			viper.AutomaticEnv()
+			//5. 读取配置文件
+			err := viper.ReadInConfig()
+			if err != nil {
+				panic(fmt.Errorf("fatal error config file: %s", err))
+			}
+			//6. 初始化配置结构体
+			viper.Unmarshal(c)
+		})
+	}
 	return c
 }
