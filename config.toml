@@ -2,8 +2,8 @@ appName = "chat_room"
 
 [mysql]
 host = "127.0.0.1"
-name = "letstalk"
-password = "1314lsx"
+name = "go-chat"
+password = "admin123"
 port = 3306
 tablePrefix = ""
 user = "root"

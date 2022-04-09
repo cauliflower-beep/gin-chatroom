@@ -21,28 +21,39 @@ func NewRouter() *gin.Engine {
 
 	socket := RunSocekt
 
-	group := server.Group("")
+	// 用户路由组
+	usergroup := server.Group("/user")
 	{
-		group.GET("/user", v1.GetUserList)
-		group.GET("/user/:uuid", v1.GetUserDetails)
-		group.GET("/user/name", v1.GetUserOrGroupByName)
-		group.POST("/user/register", v1.Register)
-		group.POST("/user/login", v1.Login)
-		group.PUT("/user", v1.ModifyUserInfo)
+		//usergroup.GET("", v1.GetUserList)
+		//usergroup.GET("/:uuid", v1.GetUserDetails)
+		usergroup.GET("/name", v1.GetUserOrGroupByName)
+		usergroup.POST("/register", v1.Register)
+		usergroup.POST("/login", v1.Login)
+		//usergroup.PUT("", v1.ModifyUserInfo)
+	}
 
-		group.POST("/friend", v1.AddFriend)
+	// 群路由组
+	group := server.Group("/group")
+	{
+		group.GET("/:uuid", v1.GetGroup)
+		group.POST("/:uuid", v1.SaveGroup)
+		group.POST("/join/:userUuid/:groupUuid", v1.JoinGroup)
+		group.GET("/user/:uuid", v1.GetGroupUsers)
+	}
 
-		group.GET("/message", v1.GetMessage)
+	group1 := server.Group("")
+	{
+		group1.GET("/user", v1.GetUserList)
+		group1.GET("/user/:uuid", v1.GetUserDetails)
+		group1.PUT("/user", v1.ModifyUserInfo)
+		group1.POST("/friend", v1.AddFriend)
 
-		group.GET("/file/:fileName", v1.GetFile)
-		group.POST("/file", v1.SaveFile)
+		group1.GET("/message", v1.GetMessage)
 
-		group.GET("/group/:uuid", v1.GetGroup)
-		group.POST("/group/:uuid", v1.SaveGroup)
-		group.POST("/group/join/:userUuid/:groupUuid", v1.JoinGroup)
-		group.GET("/group/user/:uuid", v1.GetGroupUsers)
+		group1.GET("/file/:fileName", v1.GetFile)
+		group1.POST("/file", v1.SaveFile)
 
-		group.GET("/socket.io", socket)
+		group1.GET("/socket.io", socket)
 	}
 	return server
 }

@@ -10,11 +10,14 @@ import (
 	"go.uber.org/zap"
 )
 
+
+// 指定参数，用于将http连接升级为websocket连接
 var upGrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
 		return true
 	},
 }
+
 
 func RunSocekt(c *gin.Context) {
 	user := c.Query("user")
@@ -22,7 +25,7 @@ func RunSocekt(c *gin.Context) {
 		return
 	}
 	log.Logger.Info("newUser", zap.String("newUser", user))
-	ws, err := upGrader.Upgrade(c.Writer, c.Request, nil)
+	ws, err := upGrader.Upgrade(c.Writer, c.Request, nil)		// 将http协议升级为websocket协议
 	if err != nil {
 		return
 	}

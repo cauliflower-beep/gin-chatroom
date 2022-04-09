@@ -18,7 +18,7 @@ var (
 	Float32 = zap.Float32
 )
 
-// logpath 日志文件路径
+// logpath 日志文件路径，保存在本地的路径
 // loglevel 日志级别
 func InitLogger(logpath string, loglevel string) {
 	// 日志分割
@@ -38,7 +38,7 @@ func InitLogger(logpath string, loglevel string) {
 	var level zapcore.Level
 	switch loglevel {
 	case "debug":
-		level = zap.DebugLevel
+		level = zap.DebugLevel	// DebugLevel 这个级别的日志通常很庞大，并且通常在生产中被禁用
 	case "info":
 		level = zap.InfoLevel
 	case "error":
