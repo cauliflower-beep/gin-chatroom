@@ -59,6 +59,7 @@ func init() {
 	viper.SetConfigType("toml")
 	// 设置文件路径，可以设置多个路径，viper会根据设置顺序依次查找
 	viper.AddConfigPath(".")
+	viper.AddConfigPath("..")
 	viper.AutomaticEnv()
 
 	// 读配置
