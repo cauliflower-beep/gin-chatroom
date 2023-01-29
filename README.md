@@ -196,18 +196,32 @@ git clone https://github.com/kone-net/go-chat-web
 ```shell
 npm install
 ```
+依赖安装过程中如果出现以下报错：
+
+```npm ERR! Cannot read properties of null (reading ‘pickAlgorithm‘)```
+
+可以执行如下操作：
+
+```npm cache clear --force```
+
+然后重新运行 ```npm i```命令，再次安装。安装完成，没有出现报错，就可以进入下一步正常启动项目了。
 
 如果后端地址或者端口号需要修改
 ```shell
-修改src/common/param/Params.jsx里面的IP_PORT
+修改src/chat/common/param/Params.jsx里面的IP_PORT
 ```
 
 运行前端代码默认启动端口是3000
 ```shell
 npm start
 ```
+如果因为某些包安装失误造成的启动不成功，例如我在某台机子上启动前端页面时报错:
 
-访问前端入口
+```Cannot find module 'xxx\iconv-lite\lib \index.js'. Please verify that the package.json has a valid "main" entry```
+
+安装相应的模块即可：```npm i iconv-lite```
+
+重新启动并访问前端入口：
 ```
 http://127.0.0.1:3000/login
 ```

@@ -12,18 +12,26 @@ import (
 )
 
 func main() {
-	//
-	log.InitLogger(config.GetConfig().Log.Path, config.GetConfig().Log.Level)
-	log.Logger.Info("config", log.Any("config", config.GetConfig()))
+	// 初始化配置
+	/*
+		本来这里想搞一个全局配置conf，放在 config.Init() 中赋值
+		其他需要配置的地方全都使用这个conf即可。
+		但是怕有问题，比如并发使用到这个conf的时候，会不会有bug? todo
+		所以还是调用GetConfig 生成一个副本来调用
+	*/
+	conf := config.GetConfig()
+	log.InitLogger(conf.Log.Path, conf.Log.Level)
+	log.Logger.Info("config", log.Any("config", conf))
 
-	if config.GetConfig().MsgChannelType.ChannelType == constant.KAFKA {
-		kafka.InitProducer(config.GetConfig().MsgChannelType.KafkaTopic, config.GetConfig().MsgChannelType.KafkaHosts)
-		kafka.InitConsumer(config.GetConfig().MsgChannelType.KafkaHosts)
+	if conf.MsgChannelType.ChannelType == constant.KAFKA {
+		kafka.InitProducer(conf.MsgChannelType.KafkaTopic, conf.MsgChannelType.KafkaHosts)
+		kafka.InitConsumer(conf.MsgChannelType.KafkaHosts)
 		go kafka.ConsumerMsg(server.ConsumerKafkaMsg)
 	}
 
 	log.Logger.Info("start server", log.String("start", "start web sever..."))
 
+	// 初始化路由
 	newRouter := router.NewRouter()
 
 	go server.MyServer.Start()

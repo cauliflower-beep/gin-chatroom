@@ -11,7 +11,20 @@ import (
 )
 
 func NewRouter() *gin.Engine {
-	// 设置release编译模式，即发布版本，为用户使用，不包含调试信息
+	/*
+		设置release编译模式，即发布版本(生产环境模式) 为用户使用，不包含调试信息
+		细说release与debug模式的区别（关键词搜：release与debug模式的区别）：
+		1.编译方式的本质区别
+			Debug 通常称为调试版本，它包含调试信息，并且不作任何优化，便于程序员调试程序；
+			Release 称为发布版本，它往往是进行了各种优化，使得程序在代码大小和运行速度上都是最优的，以便用户很好地使用
+		2.由于优化、链接函数库等不同，某些情况下可能会出现debug版正常，release版本错误的情况
+		gin开发模式如果不做设置，默认是debug模式
+		如果项目要发布上线，需要切换到生产环境模式
+		否则的话，打包后启动服务，控制台会输出：
+		[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+		- using env:   export GIN_MODE=release
+		- using code:  gin.SetMode(gin.ReleaseMode)
+	*/
 	gin.SetMode(gin.ReleaseMode)
 
 	server := gin.Default()
