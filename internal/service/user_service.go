@@ -76,7 +76,7 @@ func (u *userService) Register(user *model.User) error {
 
 // 用户登录
 func (u *userService) Login(user *model.User) bool {
-	pool.GetDB().AutoMigrate(&user)
+	_ = pool.GetDB().AutoMigrate(&user) // 自动迁移
 	log.Logger.Debug("user", log.Any("user in service", user))
 	db := pool.GetDB()
 
@@ -86,7 +86,8 @@ func (u *userService) Login(user *model.User) bool {
 
 	user.Uuid = queryUser.Uuid
 
-	return queryUser.Password == user.Password
+	// 校验密码是否正确 这里为了保证前面创建的几个用户，把明文比对结果也加进去了
+	return queryUser.Password == user.Password || passwd.ValidatePasswd(queryUser.Password, user.Password)
 }
 
 func (u *userService) ModifyUserInfo(user *model.User) error {

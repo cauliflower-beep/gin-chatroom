@@ -12,10 +12,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// 注册
+// Login
+//  @Description: 登录
+//  @param c
 func Login(c *gin.Context) {
 	var user model.User
-	// c.BindJSON(&user)
 	// 将注册参数与用户结构体绑定
 	err := c.ShouldBindJSON(&user)
 	if err != nil {
