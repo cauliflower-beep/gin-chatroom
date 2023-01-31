@@ -24,7 +24,7 @@ func Login(c *gin.Context) {
 	}
 	log.Logger.Debug("user", log.Any("user", user))
 
-	// 响应
+	// 响应 web端没有缓存头像文件 登录的时候是以文件名来请求服务器获取的
 	if service.UserService.Login(&user) {
 		c.JSON(http.StatusOK, response.SuccessMsg(user))
 		return

@@ -74,7 +74,11 @@ func (u *userService) Register(user *model.User) error {
 	return nil
 }
 
-// 用户登录
+// Login
+//  @Description: 用户登录
+//  @receiver u
+//  @param user
+//  @return bool
 func (u *userService) Login(user *model.User) bool {
 	_ = pool.GetDB().AutoMigrate(&user) // 自动迁移
 	log.Logger.Debug("user", log.Any("user in service", user))
@@ -192,7 +196,12 @@ func (u *userService) AddFriend(userFriendRequest *request.FriendRequest) error 
 	return nil
 }
 
-// 修改头像
+// ModifyUserAvatar
+//  @Description: 修改头像
+//  @receiver u
+//  @param avatar
+//  @param userUuid
+//  @return error
 func (u *userService) ModifyUserAvatar(avatar string, userUuid string) error {
 	var queryUser *model.User
 	db := pool.GetDB()
