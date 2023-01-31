@@ -1,6 +1,7 @@
 package service
 
 import (
+	"chat-room/pkg/validate"
 	"time"
 
 	"chat-room/internal/dao/pool"
@@ -18,9 +19,22 @@ type userService struct {
 
 var UserService = new(userService)
 
-
-// 用户注册，数据保存进数据库
+// Register
+//  @Description: 用户注册，数据保存进数据库
+//  @receiver u
+//  @param user
+//  @return error
 func (u *userService) Register(user *model.User) error {
+	// 验证邮箱-是否合法&已占用
+	if len(user.Email) > 0 {
+		if err := validate.IsEmail(user.Email); err != nil {
+			return err
+		}
+		// 验证邮箱是否已占用 todo
+	} else {
+		// 这一层在前端也有拦截，所以这里只是做个服务端的保护
+		return errors.New("请输入邮箱")
+	}
 	db := pool.GetDB()
 	var userCount int64
 	db.Model(user).Where("username", user.Username).Count(&userCount)
@@ -108,19 +122,18 @@ func (u *userService) GetUserList(uuid string) []model.User {
 	return queryUsers
 }
 
-
 // 添加好友
 func (u *userService) AddFriend(userFriendRequest *request.FriendRequest) error {
-	var queryUser *model.User		// 申请者数据
-	db := pool.GetDB()	// 获得一个数据库句柄
-	db.First(&queryUser, "uuid = ?", userFriendRequest.Uuid)	// 查找申请人数据
-	log.Logger.Debug("queryUser", log.Any("queryUser", queryUser))	// 终端打印日志
+	var queryUser *model.User                                      // 申请者数据
+	db := pool.GetDB()                                             // 获得一个数据库句柄
+	db.First(&queryUser, "uuid = ?", userFriendRequest.Uuid)       // 查找申请人数据
+	log.Logger.Debug("queryUser", log.Any("queryUser", queryUser)) // 终端打印日志
 	var nullId int32 = 0
 	if nullId == queryUser.Id {
 		return errors.New("申请人不存在")
 	}
 
-	var friend *model.User		// 好友数据
+	var friend *model.User // 好友数据
 	db.First(&friend, "username = ?", userFriendRequest.FriendUsername)
 	if nullId == friend.Id {
 		return errors.New("好友不存在")
@@ -144,7 +157,7 @@ func (u *userService) AddFriend(userFriendRequest *request.FriendRequest) error 
 		return errors.New("该用户已经是你好友")
 	}
 
-	db.AutoMigrate(&userFriend)	// 自动迁移，保持schema是最新的
+	db.AutoMigrate(&userFriend) // 自动迁移，保持schema是最新的
 	// 创建两条记录，保存新建的好友关系
 	db.Save(&userFriend)
 	db.Save(&userFriend2)

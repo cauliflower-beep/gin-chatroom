@@ -18,7 +18,7 @@ func Login(c *gin.Context) {
 	// c.BindJSON(&user)
 	// 将注册参数与用户结构体绑定
 	err := c.ShouldBindJSON(&user)
-	if err != nil{
+	if err != nil {
 		return
 	}
 	log.Logger.Debug("user", log.Any("user", user))
@@ -32,9 +32,12 @@ func Login(c *gin.Context) {
 	c.JSON(http.StatusOK, response.FailMsg("Login failed"))
 }
 
+// Register
+//  @Description: 用户注册 迭代为密码密文存储
+//  @param c
 func Register(c *gin.Context) {
 	var user model.User
-	c.ShouldBindJSON(&user)
+	_ = c.ShouldBindJSON(&user)
 	err := service.UserService.Register(&user)
 	if err != nil {
 		c.JSON(http.StatusOK, response.FailMsg(err.Error()))

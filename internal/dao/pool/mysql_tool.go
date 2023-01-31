@@ -25,7 +25,17 @@ func init() {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local&timeout=%s", username, password, host, port, Dbname, timeout)
 
 	//连接MYSQL, 获得DB类型实例，用于后面的数据库读写操作。
-	_db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+	var err error
+	/*
+		这个坑之前怎么没有踩出来呢？源代码:
+		_db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+			Logger: logger.Default.LogMode(logger.Info),
+		})
+		这样的话相当于是建立了一个局部变量 _db 并为其赋值，全局变量的 _db 还是nil
+		所以可以在上面先声明一个 err
+		go 没有python的显示关键词global的提示，所以全局变量使用需要注意
+	*/
+	_db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
 	})
 	if err != nil {

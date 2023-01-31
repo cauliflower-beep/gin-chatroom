@@ -36,7 +36,9 @@ func NewServer() *Server {
 	}
 }
 
-// 消费kafka里面的消息, 然后直接放入go channel中统一进行消费
+// ConsumerKafkaMsg
+//  @Description: 消费kafka里面的消息, 然后直接放入go channel中统一进行消费
+//  @param data
 func ConsumerKafkaMsg(data []byte) {
 	MyServer.Broadcast <- data
 }
