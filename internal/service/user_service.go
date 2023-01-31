@@ -1,6 +1,7 @@
 package service
 
 import (
+	"chat-room/pkg/common/passwd"
 	"chat-room/pkg/validate"
 	"time"
 
@@ -25,23 +26,47 @@ var UserService = new(userService)
 //  @param user
 //  @return error
 func (u *userService) Register(user *model.User) error {
+	db := pool.GetDB()
+	var userCount int64
+
 	// 验证邮箱-是否合法&已占用
 	if len(user.Email) > 0 {
 		if err := validate.IsEmail(user.Email); err != nil {
 			return err
 		}
-		// 验证邮箱是否已占用 todo
+		// 验证邮箱是否已占用
+		db.Model(user).Where("email", user.Email).Count(&userCount)
+		if userCount > 0 {
+			return errors.New("email already exists")
+		}
 	} else {
 		// 这一层在前端也有拦截，所以这里只是做个服务端的保护
 		return errors.New("请输入邮箱")
 	}
-	db := pool.GetDB()
-	var userCount int64
+
+	// SELECT count(*) FROM `users` WHERE `username` = '妮妮'
 	db.Model(user).Where("username", user.Username).Count(&userCount)
 	if userCount > 0 {
 		return errors.New("user already exists")
 	}
-	user.Uuid = uuid.New().String()
+
+	/*
+		密码加密处理-数据库被“拖库”明文存储的密码就变得不安全.
+		应该计算密码的哈希值，而不是加密它
+		加密是双向算法，之前的做法是使用 md5 散列的方式，因为 md5 不可逆，无法从密文推出原文
+		而哈希值是单项算法.
+		但是 HASH 算法最大的问题是，会发生撞库，也就是说，有可能出现多个原文得到同一个密码。
+		下面这个式子是存在的，如果原文是 M1，只需要另外一个同样 HASH 值的密码即可登录。
+			MD5(M1) = MD5(M2) = MD5(M3)
+		一种攻击方法是，攻击者记录了一张巨大的密码库，预先计算了常用密码的 hash 值，这样只需要搜索 hash 值就能寻找到一个合适的密码用于登录。
+		这就是被彩虹表(rainbow-table)攻击,但可以通过加盐来抵御
+		brcypt有两个特点：
+		·每次hash出来的值不一样
+		·计算非常缓慢
+		这两个特点会让攻击者的代价变得难以忍受(应用自身性能也会收到影响，但考虑到注册、登录并不是随时在发生，因此可以忍受)，所以推荐
+	*/
+	user.Password = passwd.EncodePasswd(user.Password)
+	user.Uuid = uuid.NewString()
 	user.CreateAt = time.Now()
 	user.DeleteAt = 0
 
