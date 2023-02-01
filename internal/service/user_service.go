@@ -3,6 +3,7 @@ package service
 import (
 	"chat-room/pkg/common/passwd"
 	"chat-room/pkg/validate"
+	"fmt"
 	"time"
 
 	"chat-room/internal/dao/pool"
@@ -147,7 +148,10 @@ func (u *userService) GetUserList(uuid string) []model.User {
 	}
 
 	var queryUsers []model.User
-	db.Raw("SELECT u.username, u.uuid, u.avatar FROM user_friends AS uf JOIN users AS u ON uf.friend_id = u.id WHERE uf.user_id = ?", queryUser.Id).Scan(&queryUsers)
+	// 获取全部好友sql
+	sql := fmt.Sprintf("select u.username, u.uuid, u.avatar FROM user_friends AS uf JOIN users AS u on u.id != %v and (uf.friend_id = u.id or uf.user_id = u.id) "+
+		"where uf.user_id = %v or uf.friend_id = %v;", queryUser.Id, queryUser.Id, queryUser.Id)
+	db.Raw(sql).Scan(&queryUsers)
 
 	return queryUsers
 }
@@ -170,8 +174,8 @@ func (u *userService) AddFriend(userFriendRequest *request.FriendRequest) error 
 		return errors.New("好友不存在")
 	}
 	/*
-		原逻辑只添加一条记录，这样在a添加b之后，b是看不到好友列表有a的
-		这里我改成添加两条记录，a加b之后，双方的列表中都有对方
+		原逻辑是单向好友关系，在a添加b之后，b是看不到好友列表有a的，需要添加两条记录才可以看到
+		这里改成双向好友关系，a加b之后，双方的好友列表中都有彼此，只添加一条好友记录即可
 		23.02.01更新
 		其实添加一条也ok 查询好友列表的时候把自己作为添加人或者被添加人一起查就好了
 	*/
@@ -181,10 +185,22 @@ func (u *userService) AddFriend(userFriendRequest *request.FriendRequest) error 
 	}
 	// *有一个判定的过程，等待对方通过验证 todo
 
-	var userFriendQuery *model.UserFriend
 	/*
 		自己添加过对方，或者对方添加过自己，则无需重复添加
+		23.02.01 执行原生sql 不必查询两次数据库
+		这里遇到个问题，直接exec，RowsAffected总是0，必须扫描进 userFriendQuery 中才能够获取到非0的值 why?todo
+		知识捡漏：
+		gorm执行原生sql有两种方式.
+		1.exec-执行查入删除等操作
+		2.raw-执行查询操作
 	*/
+	var userFriendQuery *model.UserFriend
+	//sql := fmt.Sprintf("select * from user_friends where (`user_id` = %v and `friend_id` = %v) or (`user_id` = %v and `friend_id` = %v);",
+	//	queryUser.Id, friend.Id, friend.Id, queryUser.Id)
+	//if db.Exec(sql).Scan(userFriendQuery).RowsAffected != 0 && userFriendQuery != nil {
+	//	return errors.New("该用户已经是你好友")
+	//}
+	// 下面这段查询两次的代码保留，后续可作为性能分析的对比 todo
 	if db.First(&userFriendQuery, "user_id = ? and friend_id = ?", queryUser.Id, friend.Id).RowsAffected != 0 ||
 		db.First(&userFriendQuery, "user_id = ? and friend_id = ?", friend.Id, queryUser.Id).RowsAffected != 0 {
 		return errors.New("该用户已经是你好友")

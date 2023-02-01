@@ -10,6 +10,12 @@ import (
 	"gorm.io/gorm/logger"
 )
 
+/*
+	全局_db对象, 我们执行数据库操作主要通过他实现
+	不用担心协程并发使用同样的db对象会共用同一个连接,
+	db对象在调用它的方法时，会从数据库连接池中获取新的连接
+	注意: 使用连接池技术后，千万不要使用完db后调用db.Close关闭数据库连接，否则会导致整个数据库连接池关闭，造成连接池没有可用连接的问题
+*/
 var _db *gorm.DB
 
 func init() {
@@ -45,10 +51,21 @@ func init() {
 	sqlDB, _ := _db.DB()
 
 	//设置数据库连接池参数
-	sqlDB.SetMaxOpenConns(conf.MySQL.MaxConns) //设置数据库连接池最大连接数
-	sqlDB.SetMaxIdleConns(conf.MySQL.MaxIdle)  //连接池最大允许的空闲连接数，如果没有sql任务需要执行的连接数大于20，超过的连接会被连接池关闭。
+	/*
+		数据库连接池最大连接数
+		数据库的连接过多，也许会导致错误、连接阻塞
+	*/
+	sqlDB.SetMaxOpenConns(conf.MySQL.MaxConns)
+	/*
+		连接池最大允许的空闲连接数，如果没有sql任务需要执行的连接数大于20，超过的连接会被连接池关闭。
+		大量的空闲连接会导致额外的工作和延迟
+	*/
+	sqlDB.SetMaxIdleConns(conf.MySQL.MaxIdle)
 }
 
+// GetDB
+//  @Description: 获取数据库连接句柄
+//  @return *gorm.DB
 func GetDB() *gorm.DB {
 	return _db
 }
