@@ -152,46 +152,48 @@ func (u *userService) GetUserList(uuid string) []model.User {
 	return queryUsers
 }
 
-// 添加好友
+// AddFriend
+//  @Description: 好友添加逻辑
+//  @receiver u
+//  @param userFriendRequest
+//  @return error
 func (u *userService) AddFriend(userFriendRequest *request.FriendRequest) error {
-	var queryUser *model.User                                      // 申请者数据
-	db := pool.GetDB()                                             // 获得一个数据库句柄
-	db.First(&queryUser, "uuid = ?", userFriendRequest.Uuid)       // 查找申请人数据
-	log.Logger.Debug("queryUser", log.Any("queryUser", queryUser)) // 终端打印日志
-	var nullId int32 = 0
-	if nullId == queryUser.Id {
+	var queryUser *model.User // 申请者
+	db := pool.GetDB()
+	if db.First(&queryUser, "uuid = ?", userFriendRequest.Uuid).RowsAffected == 0 {
 		return errors.New("申请人不存在")
 	}
+	log.Logger.Debug("queryUser", log.Any("queryUser", queryUser))
 
 	var friend *model.User // 好友数据
-	db.First(&friend, "username = ?", userFriendRequest.FriendUsername)
-	if nullId == friend.Id {
+	if db.First(&friend, "username = ?", userFriendRequest.FriendUsername).RowsAffected == 0 {
 		return errors.New("好友不存在")
 	}
-
-	// 第一条记录
-	userFriend := model.UserFriend{
+	/*
+		原逻辑只添加一条记录，这样在a添加b之后，b是看不到好友列表有a的
+		这里我改成添加两条记录，a加b之后，双方的列表中都有对方
+		23.02.01更新
+		其实添加一条也ok 查询好友列表的时候把自己作为添加人或者被添加人一起查就好了
+	*/
+	friendRec := model.UserFriend{
 		UserId:   queryUser.Id,
 		FriendId: friend.Id,
 	}
-	// 第二条记录
-	userFriend2 := model.UserFriend{
-		UserId:   friend.Id,
-		FriendId: queryUser.Id,
-	}
-	// *有一个判定的过程，等待对方通过验证
+	// *有一个判定的过程，等待对方通过验证 todo
 
 	var userFriendQuery *model.UserFriend
-	db.First(&userFriendQuery, "user_id = ? and friend_id = ?", queryUser.Id, friend.Id)
-	if userFriendQuery.ID != nullId {
+	/*
+		自己添加过对方，或者对方添加过自己，则无需重复添加
+	*/
+	if db.First(&userFriendQuery, "user_id = ? and friend_id = ?", queryUser.Id, friend.Id).RowsAffected != 0 ||
+		db.First(&userFriendQuery, "user_id = ? and friend_id = ?", friend.Id, queryUser.Id).RowsAffected != 0 {
 		return errors.New("该用户已经是你好友")
 	}
-
-	db.AutoMigrate(&userFriend) // 自动迁移，保持schema是最新的
-	// 创建两条记录，保存新建的好友关系
-	db.Save(&userFriend)
-	db.Save(&userFriend2)
-	log.Logger.Debug("userFriend", log.Any("userFriend", userFriend))
+	migrate := &model.UserFriend{}
+	_ = db.AutoMigrate(&migrate) // 自动迁移，保持schema是最新的
+	// 创建好友添加记录
+	db.Save(&friendRec)
+	log.Logger.Debug("userFriend", log.Any("userFriend", friendRec))
 
 	return nil
 }

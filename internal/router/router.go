@@ -40,8 +40,8 @@ func NewRouter() *gin.Engine {
 		//usergroup.GET("", v1.GetUserList)
 		//usergroup.GET("/:uuid", v1.GetUserDetails)
 		usergroup.GET("/name", v1.GetUserOrGroupByName)
-		usergroup.POST("/register", v1.Register)
-		usergroup.POST("/login", v1.Login)
+		usergroup.POST("/register", v1.Register) // 注册
+		usergroup.POST("/login", v1.Login)       // 登录
 		//usergroup.PUT("", v1.ModifyUserInfo)
 	}
 

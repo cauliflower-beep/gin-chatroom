@@ -78,9 +78,12 @@ func GetUserList(c *gin.Context) {
 	c.JSON(http.StatusOK, response.SuccessMsg(service.UserService.GetUserList(uuid)))
 }
 
+// AddFriend
+//  @Description: 添加好友
+//  @param c
 func AddFriend(c *gin.Context) {
 	var userFriendRequest request.FriendRequest
-	c.ShouldBindJSON(&userFriendRequest)
+	_ = c.ShouldBindJSON(&userFriendRequest)
 
 	err := service.UserService.AddFriend(&userFriendRequest)
 	if nil != err {
