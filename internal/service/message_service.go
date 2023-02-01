@@ -21,23 +21,29 @@ type messageService struct {
 
 var MessageService = new(messageService)
 
+// GetMessages
+//  @Description: 根据payload请求，获取对应消息表中的聊天记录
+//  @receiver m
+//  @param message
+//  @return []response.MessageResponse
+//  @return error
 func (m *messageService) GetMessages(message request.MessageRequest) ([]response.MessageResponse, error) {
 	db := pool.GetDB()
 
 	migrate := &model.Message{}
-	pool.GetDB().AutoMigrate(&migrate)
+	_ = pool.GetDB().AutoMigrate(&migrate)
 
+	// 单聊
 	if message.MessageType == constant.MESSAGE_TYPE_USER {
 		var queryUser *model.User
 		db.First(&queryUser, "uuid = ?", message.Uuid)
-
-		if NULL_ID == queryUser.Id {
+		if queryUser.Id == NULL_ID {
 			return nil, errors.New("用户不存在")
 		}
 
 		var friend *model.User
 		db.First(&friend, "username = ?", message.FriendUsername)
-		if NULL_ID == friend.Id {
+		if friend.Id == NULL_ID {
 			return nil, errors.New("用户不存在")
 		}
 
@@ -45,10 +51,10 @@ func (m *messageService) GetMessages(message request.MessageRequest) ([]response
 
 		db.Raw("SELECT m.id, m.from_user_id, m.to_user_id, m.content, m.content_type, m.url, m.created_at, u.username AS from_username, u.avatar, to_user.username AS to_username  FROM messages AS m LEFT JOIN users AS u ON m.from_user_id = u.id LEFT JOIN users AS to_user ON m.to_user_id = to_user.id WHERE from_user_id IN (?, ?) AND to_user_id IN (?, ?)",
 			queryUser.Id, friend.Id, queryUser.Id, friend.Id).Scan(&messages)
-
 		return messages, nil
 	}
 
+	// 群聊
 	if message.MessageType == constant.MESSAGE_TYPE_GROUP {
 		messages, err := fetchGroupMessage(db, message.Uuid)
 		if err != nil {

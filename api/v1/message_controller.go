@@ -11,12 +11,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// 获取消息列表
+// GetMessage
+//  @Description: 获取消息列表 消息保存在数据库中 打开聊天窗口就请求一次消息表
+//  @param c
 func GetMessage(c *gin.Context) {
 	log.Logger.Info(c.Query("uuid"))
 	var messageRequest request.MessageRequest
-	err := c.BindQuery(&messageRequest)
-	if nil != err {
+	err := c.BindQuery(&messageRequest) // 绑定请求的 payload
+	if err != nil {
 		log.Logger.Error("bindQueryError", log.Any("bindQueryError", err))
 	}
 	log.Logger.Info("messageRequest params: ", log.Any("messageRequest", messageRequest))
