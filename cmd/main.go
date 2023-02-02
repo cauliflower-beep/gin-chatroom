@@ -23,6 +23,7 @@ func main() {
 	log.InitLogger(conf.Log.Path, conf.Log.Level)
 	log.Logger.Info("config", log.Any("config", conf))
 
+	// 使用kafka作为消息队列，可以分布式扩展消息聊天程序
 	if conf.MsgChannelType.ChannelType == constant.KAFKA {
 		kafka.InitProducer(conf.MsgChannelType.KafkaTopic, conf.MsgChannelType.KafkaHosts)
 		kafka.InitConsumer(conf.MsgChannelType.KafkaHosts)

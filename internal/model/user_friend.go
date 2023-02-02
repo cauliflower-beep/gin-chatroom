@@ -9,9 +9,10 @@ import (
 Gorm模型定义。
 创建一个结构体，然后使用gorm框架可以将结构体映射为相对应的关系数据库的数据表；
 或者查询数据表中的数据来填充结构体
- */
+*/
 
-// 好友结构
+// UserFriend
+// @Description: 好友结构
 type UserFriend struct {
 	ID        int32                 `json:"id" gorm:"primarykey"`
 	CreatedAt time.Time             `json:"createAt"`

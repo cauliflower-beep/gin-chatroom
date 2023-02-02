@@ -7,6 +7,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+// TomlConfig
+// @Description: 全部配置
 type TomlConfig struct {
 	AppName        string
 	MySQL          MySQLConfig
@@ -15,7 +17,8 @@ type TomlConfig struct {
 	MsgChannelType MsgChannelType
 }
 
-// MySQL相关配置
+// MySQLConfig
+// @Description: MySQL相关配置
 type MySQLConfig struct {
 	Host        string
 	Name        string
@@ -28,20 +31,23 @@ type MySQLConfig struct {
 	MaxIdle     int // 最大空闲连接数
 }
 
-// 日志保存地址
+// LogConfig
+// @Description: 日志保存地址
 type LogConfig struct {
 	Path  string
 	Level string
 }
 
-// 相关地址信息，例如静态文件地址
+// PathConfig
+// @Description: 路径配置，例如静态文件保存地址
 type PathConfig struct {
 	FilePath string
 }
 
-// 消息队列类型及其消息队列相关信息
-// gochannel为单机使用go默认的channel进行消息传递
-// kafka是使用kafka作为消息队列，可以分布式扩展消息聊天程序
+// MsgChannelType
+// @Description: 消息队列类型及其消息队列相关信息
+// @Description: gochannel为单机使用go默认的channel进行消息传递
+// @Description: kafka是使用kafka作为消息队列，可以分布式扩展消息聊天程序
 type MsgChannelType struct {
 	ChannelType string
 	KafkaHosts  string
@@ -68,15 +74,17 @@ func init() {
 		panic(fmt.Errorf("fatal error config file: %s", err))
 	}
 
-	viper.Unmarshal(&c)
+	_ = viper.Unmarshal(&c)
 }
 
 func GetConfig() TomlConfig {
 	return c
 }
 
-// 懒汉模式
-// 注意结构体判空
+// GetConfigLazy
+//  @Description: 懒汉模式
+//  @Description: 注意结构体判空
+//  @return TomlConfig
 func GetConfigLazy() TomlConfig {
 	if c == (TomlConfig{}) {
 		one.Do(func() {
@@ -94,7 +102,7 @@ func GetConfigLazy() TomlConfig {
 				panic(fmt.Errorf("fatal error config file: %s", err))
 			}
 			//6. 初始化配置结构体
-			viper.Unmarshal(c)
+			_ = viper.Unmarshal(c)
 		})
 	}
 	return c

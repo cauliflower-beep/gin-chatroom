@@ -48,15 +48,17 @@ func Register(c *gin.Context) {
 	c.JSON(http.StatusOK, response.SuccessMsg(user))
 }
 
+// ModifyUserInfo
+//  @Description: 修改用户数据
+//  @param c
 func ModifyUserInfo(c *gin.Context) {
 	var user model.User
-	c.ShouldBindJSON(&user)
+	_ = c.ShouldBindJSON(&user)
 	log.Logger.Debug("user", log.Any("user", user))
 	if err := service.UserService.ModifyUserInfo(&user); err != nil {
 		c.JSON(http.StatusOK, response.FailMsg(err.Error()))
 		return
 	}
-
 	c.JSON(http.StatusOK, response.SuccessMsg(nil))
 }
 
@@ -66,7 +68,9 @@ func GetUserDetails(c *gin.Context) {
 	c.JSON(http.StatusOK, response.SuccessMsg(service.UserService.GetUserDetails(uuid)))
 }
 
-// 通过用户名获取用户信息
+// GetUserOrGroupByName
+//  @Description: 通过用户名获取用户信息
+//  @param c
 func GetUserOrGroupByName(c *gin.Context) {
 	name := c.Query("name")
 

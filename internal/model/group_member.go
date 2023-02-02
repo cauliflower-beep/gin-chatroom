@@ -5,7 +5,8 @@ import (
 	"time"
 )
 
-// 群成员结构
+// GroupMember
+// @Description: 群成员结构
 type GroupMember struct {
 	ID        int32                 `json:"id" gorm:"primarykey"`
 	CreatedAt time.Time             `json:"createAt"`

@@ -95,7 +95,7 @@ func InitLogger(logpath string, loglevel string) {
 	caller := zap.AddCaller()
 	// 开启文件及行号
 	development := zap.Development()
-	// 设置初始化字段,如：添加一个服务器名称
+	// 设置初始化字段,如：添加一个服务器名称 之后每条日志都会带上这个初始化字段
 	filed := zap.Fields(zap.String("application", "chat-room"))
 	// 构造日志 New是一种高度定制化的创建Logger的方法
 	Logger = zap.New(core, caller, development, filed)

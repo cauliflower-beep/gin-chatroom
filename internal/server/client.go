@@ -19,7 +19,7 @@ type Client struct {
 
 func (c *Client) Read() {
 	defer func() {
-		MyServer.Ungister <- c
+		MyServer.Offline <- c
 		c.Conn.Close()
 	}()
 
@@ -28,7 +28,7 @@ func (c *Client) Read() {
 		_, message, err := c.Conn.ReadMessage()
 		if err != nil {
 			log.Logger.Error("client read message error", log.Any("client read message error", err.Error()))
-			MyServer.Ungister <- c
+			MyServer.Offline <- c
 			c.Conn.Close()
 			break
 		}

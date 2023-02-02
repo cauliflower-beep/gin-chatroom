@@ -95,6 +95,11 @@ func (u *userService) Login(user *model.User) bool {
 	return queryUser.Password == user.Password || passwd.ValidatePasswd(queryUser.Password, user.Password)
 }
 
+// ModifyUserInfo
+//  @Description: 用户信息修改逻辑
+//  @receiver u
+//  @param user
+//  @return error
 func (u *userService) ModifyUserInfo(user *model.User) error {
 	var queryUser *model.User
 	db := pool.GetDB()
@@ -104,6 +109,7 @@ func (u *userService) ModifyUserInfo(user *model.User) error {
 	if nullId == queryUser.Id {
 		return errors.New("用户不存在")
 	}
+	
 	queryUser.Nickname = user.Nickname
 	queryUser.Email = user.Email
 	queryUser.Password = user.Password
@@ -119,7 +125,11 @@ func (u *userService) GetUserDetails(uuid string) model.User {
 	return *queryUser
 }
 
-// 通过名称查找群组或者用户（添加好友或者群组时可用）
+// GetUserOrGroupByName
+//  @Description: 通过名称查找群组或者用户（添加好友或者群组时可用）
+//  @receiver u
+//  @param name
+//  @return response.SearchResponse
 func (u *userService) GetUserOrGroupByName(name string) response.SearchResponse {
 	var queryUser *model.User
 	db := pool.GetDB()
@@ -148,7 +158,7 @@ func (u *userService) GetUserList(uuid string) []model.User {
 	}
 
 	var queryUsers []model.User
-	// 获取全部好友sql
+	// 获取全部好友sql 23.02.02-有bug 如果我添加自己，那好友列表不会展示我自己 todo
 	sql := fmt.Sprintf("select u.username, u.uuid, u.avatar FROM user_friends AS uf JOIN users AS u on u.id != %v and (uf.friend_id = u.id or uf.user_id = u.id) "+
 		"where uf.user_id = %v or uf.friend_id = %v;", queryUser.Id, queryUser.Id, queryUser.Id)
 	db.Raw(sql).Scan(&queryUsers)

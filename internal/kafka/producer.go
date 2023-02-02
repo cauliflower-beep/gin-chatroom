@@ -10,6 +10,10 @@ import (
 var producer sarama.AsyncProducer
 var topic string = "default_message"
 
+// InitProducer
+//  @Description: 初始化生产者
+//  @param topicInput
+//  @param hosts
 func InitProducer(topicInput, hosts string) {
 	topic = topicInput
 	config := sarama.NewConfig()

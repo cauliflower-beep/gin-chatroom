@@ -5,7 +5,8 @@ import (
 	"time"
 )
 
-// 聊天记录结构
+// Message
+// @Description: 聊天记录结构
 type Message struct {
 	ID          int32                 `json:"id" gorm:"primarykey"`
 	CreatedAt   time.Time             `json:"createAt"`

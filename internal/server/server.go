@@ -19,11 +19,11 @@ import (
 var MyServer = NewServer()
 
 type Server struct {
-	Clients   map[string]*Client
+	Clients   map[string]*Client // 维护用户-conn的映射 用户登录则加入map/用户离线则从map中删除
 	mutex     *sync.Mutex
-	Broadcast chan []byte
-	Register  chan *Client
-	Ungister  chan *Client
+	Broadcast chan []byte  // 广播消息
+	Register  chan *Client // 用户登录channel 有数据则说明有用户登进来
+	Offline   chan *Client // 用户离线channel 有数据则说明有用户离线
 }
 
 func NewServer() *Server {
@@ -32,7 +32,7 @@ func NewServer() *Server {
 		Clients:   make(map[string]*Client),
 		Broadcast: make(chan []byte),
 		Register:  make(chan *Client),
-		Ungister:  make(chan *Client),
+		Offline:   make(chan *Client),
 	}
 }
 
@@ -43,12 +43,15 @@ func ConsumerKafkaMsg(data []byte) {
 	MyServer.Broadcast <- data
 }
 
+// Start
+//  @Description: 开启服务器处理过程
+//  @receiver s
 func (s *Server) Start() {
 	log.Logger.Info("start server", log.Any("start server", "start server..."))
 	for {
 		select {
-		case conn := <-s.Register:
-			log.Logger.Info("login", log.Any("login", "new user login in"+conn.Name))
+		case conn := <-s.Register: // 用户登录
+			log.Logger.Info("login", log.Any("login", "new user login in. uuid|"+conn.Name))
 			s.Clients[conn.Name] = conn
 			msg := &protocol.Message{
 				From:    "System",
@@ -58,27 +61,31 @@ func (s *Server) Start() {
 			protoMsg, _ := proto.Marshal(msg)
 			conn.Send <- protoMsg
 
-		case conn := <-s.Ungister:
-			log.Logger.Info("loginout", log.Any("loginout", conn.Name))
+		case conn := <-s.Offline: // 用户离线
+			log.Logger.Info("logout", log.Any("logout. uuid|", conn.Name))
 			if _, ok := s.Clients[conn.Name]; ok {
 				close(conn.Send)
-				delete(s.Clients, conn.Name)
+				_ = conn.Conn.Close()        // 原代码中没有关闭连接的操作 这里要不要加? todo
+				delete(s.Clients, conn.Name) // map中删除已经离线的用户
 			}
 
 		case message := <-s.Broadcast:
 			msg := &protocol.Message{}
-			proto.Unmarshal(message, msg)
-
+			err := proto.Unmarshal(message, msg)
+			if err != nil {
+				log.Logger.Error("broadcast msg unmarshal", log.Any("err|", err))
+			}
 			if msg.To != "" {
-				// 一般消息，比如文本消息，视频文件消息等
+				// 普通消息-文本/文件/图片/语音/视频等
 				if msg.ContentType >= constant.TEXT && msg.ContentType <= constant.VIDEO {
 					// 保存消息只会在存在socket的一个端上进行保存，防止分布式部署后，消息重复问题
 					_, exits := s.Clients[msg.From]
 					if exits {
+						// 1.保存消息
 						saveMessage(msg)
 					}
-
-					if msg.MessageType == constant.MESSAGE_TYPE_USER {
+					// 2.转发至对应客户端的消息接收通道
+					if msg.MessageType == constant.MESSAGE_TYPE_USER { // 单聊
 						client, ok := s.Clients[msg.To]
 						if ok {
 							msgByte, err := proto.Marshal(msg)
@@ -86,12 +93,14 @@ func (s *Server) Start() {
 								client.Send <- msgByte
 							}
 						}
-					} else if msg.MessageType == constant.MESSAGE_TYPE_GROUP {
+					} else if msg.MessageType == constant.MESSAGE_TYPE_GROUP { // 群聊
 						sendGroupMessage(msg, s)
 					}
 				} else {
-					// 语音电话，视频电话等，仅支持单人聊天，不支持群聊
-					// 不保存文件，直接进行转发
+					/*
+						语音电话，视频电话等，仅支持单人聊天，不支持群聊 当然可以扩展 todo
+						不保存文件，直接进行转发
+					*/
 					client, ok := s.Clients[msg.To]
 					if ok {
 						client.Send <- message
@@ -106,7 +115,7 @@ func (s *Server) Start() {
 					select {
 					case conn.Send <- message:
 					default:
-						close(conn.Send)
+						close(conn.Send) // 关闭某个连接的消息发送通道
 						delete(s.Clients, conn.Name)
 					}
 				}
@@ -115,7 +124,10 @@ func (s *Server) Start() {
 	}
 }
 
-// 发送给群组消息,需要查询该群所有人员依次发送
+// sendGroupMessage
+//  @Description: 发送给群组消息,需要查询该群所有人员依次发送
+//  @param msg
+//  @param s
 func sendGroupMessage(msg *protocol.Message, s *Server) {
 	// 发送给群组的消息，查找该群所有的用户进行发送
 	users := service.GroupService.GetUserIdByGroupUuid(msg.To)
@@ -150,7 +162,9 @@ func sendGroupMessage(msg *protocol.Message, s *Server) {
 	}
 }
 
-// 保存消息，如果是文本消息直接保存，如果是文件，语音等消息，保存文件后，保存对应的文件路径
+// saveMessage
+//  @Description: 保存消息，如果是文本消息直接保存; 如果是文件、语音等消息，保存文件到配置指定路径后，保存对应的文件路径
+//  @param message
 func saveMessage(message *protocol.Message) {
 	// 如果上传的是base64字符串文件，解析文件保存
 	if message.ContentType == 2 {

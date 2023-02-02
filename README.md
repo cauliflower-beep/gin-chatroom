@@ -461,7 +461,7 @@ func (s *Server) Start() {
 			protoMsg, _ := proto.Marshal(msg)
 			conn.Send <- protoMsg
 
-		case conn := <-s.Ungister:
+		case conn := <-s.Offline:
 			log.Info("loginout", log.Any("loginout", conn.Name))
 			if _, ok := s.Clients[conn.Name]; ok {
 				close(conn.Send)
