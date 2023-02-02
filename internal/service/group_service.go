@@ -15,13 +15,19 @@ type groupService struct {
 
 var GroupService = new(groupService)
 
+// GetGroups
+//  @Description: 获取群聊列表逻辑
+//  @receiver g
+//  @param uuid
+//  @return []response.GroupResponse
+//  @return error
 func (g *groupService) GetGroups(uuid string) ([]response.GroupResponse, error) {
 	db := pool.GetDB()
 
 	migrate := &model.Group{}
-	pool.GetDB().AutoMigrate(&migrate)
+	_ = pool.GetDB().AutoMigrate(&migrate)
 	migrate2 := &model.GroupMember{}
-	pool.GetDB().AutoMigrate(&migrate2)
+	_ = pool.GetDB().AutoMigrate(&migrate2)
 
 	var queryUser *model.User
 	db.First(&queryUser, "uuid = ?", uuid)
@@ -38,18 +44,26 @@ func (g *groupService) GetGroups(uuid string) ([]response.GroupResponse, error) 
 	return groups, nil
 }
 
+// SaveGroup
+//  @Description: 聊天群组创建逻辑
+//  @receiver g
+//  @param userUuid
+//  @param group
 func (g *groupService) SaveGroup(userUuid string, group model.Group) {
 	db := pool.GetDB()
 	var fromUser model.User
 	db.Find(&fromUser, "uuid = ?", userUuid)
-	if fromUser.Id <= 0 {
+	if fromUser.Id <= 0 { // 创建者不存在
 		return
 	}
 
 	group.UserId = fromUser.Id
-	group.Uuid = uuid.New().String()
+	group.Uuid = uuid.NewString()
 	db.Save(&group)
-
+	/*
+		分组创建成功之后，将创建者加入分组
+		是否有必要创建一个事务，将 创建分组记录 和 添加群主 两条sql放在一个事务中处理
+	*/
 	groupMember := model.GroupMember{
 		UserId:   fromUser.Id,
 		GroupId:  group.ID,
@@ -59,6 +73,11 @@ func (g *groupService) SaveGroup(userUuid string, group model.Group) {
 	db.Save(&groupMember)
 }
 
+// GetUserIdByGroupUuid
+//  @Description: 获取组内成员
+//  @receiver g
+//  @param groupUuid
+//  @return []model.User
 func (g *groupService) GetUserIdByGroupUuid(groupUuid string) []model.User {
 	var group model.Group
 	db := pool.GetDB()

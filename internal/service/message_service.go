@@ -48,7 +48,10 @@ func (m *messageService) GetMessages(message request.MessageRequest) ([]response
 		}
 
 		var messages []response.MessageResponse
-
+		/*
+			单聊逻辑就是把消息内容放到数据库中
+			点用户头像打开聊天窗口的时候就去表中查询对应记录返回给 app
+		*/
 		db.Raw("SELECT m.id, m.from_user_id, m.to_user_id, m.content, m.content_type, m.url, m.created_at, u.username AS from_username, u.avatar, to_user.username AS to_username  FROM messages AS m LEFT JOIN users AS u ON m.from_user_id = u.id LEFT JOIN users AS to_user ON m.to_user_id = to_user.id WHERE from_user_id IN (?, ?) AND to_user_id IN (?, ?)",
 			queryUser.Id, friend.Id, queryUser.Id, friend.Id).Scan(&messages)
 		return messages, nil

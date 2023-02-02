@@ -45,13 +45,14 @@ func NewRouter() *gin.Engine {
 		//usergroup.PUT("", v1.ModifyUserInfo)
 	}
 
-	// 群路由组
+	// 聊天群组路由组
 	group := server.Group("/group")
 	{
 		group.GET("/:uuid", v1.GetGroup)
-		group.POST("/:uuid", v1.SaveGroup)
-		group.POST("/join/:userUuid/:groupUuid", v1.JoinGroup)
+		group.POST("/:uuid", v1.SaveGroup)                     // 创建群聊
+		group.POST("/join/:userUuid/:groupUuid", v1.JoinGroup) // 加入群聊
 		group.GET("/user/:uuid", v1.GetGroupUsers)
+		// 更换群头像 todo
 	}
 
 	group1 := server.Group("")
@@ -64,6 +65,7 @@ func NewRouter() *gin.Engine {
 		group1.GET("/message", v1.GetMessage)
 
 		group1.GET("/file/:fileName", v1.GetFile)
+		// 修改这块儿的路由 一点都不清晰，都找不到是在哪里添加的头像 todo
 		group1.POST("/file", v1.SaveFile)
 
 		group1.GET("/socket.io", socket)
