@@ -17,10 +17,10 @@ var upGrader = websocket.Upgrader{
 	},
 }
 
-// RunSocekt
+// RunSocket
 //  @Description:每来一个用户，创建一个socket连接
 //  @param c
-func RunSocekt(c *gin.Context) {
+func RunSocket(c *gin.Context) {
 	user := c.Query("user")
 	if user == "" {
 		return
@@ -38,6 +38,10 @@ func RunSocekt(c *gin.Context) {
 	}
 
 	server.MyServer.Register <- client
+	/*
+		每个client接入的时候, 就为它分别开启一个读写协程
+		以便在单机实现更大的并发
+	*/
 	go client.Read()
 	go client.Write()
 }

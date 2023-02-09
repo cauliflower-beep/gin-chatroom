@@ -32,41 +32,41 @@ func NewRouter() *gin.Engine {
 	server.Use(Recovery)
 	// server.Use(gin.Recovery())
 
-	socket := RunSocekt
+	socket := RunSocket
 
 	// 用户路由组
-	usergroup := server.Group("/user")
+	userGroup := server.Group("/user")
 	{
-		//usergroup.GET("", v1.GetUserList)
-		//usergroup.GET("/:uuid", v1.GetUserDetails)
-		usergroup.GET("/name", v1.GetUserOrGroupByName)
-		usergroup.POST("/register", v1.Register) // 注册
-		usergroup.POST("/login", v1.Login)       // 登录
-		//usergroup.PUT("", v1.ModifyUserInfo)
+		userGroup.GET("", v1.GetUserList)
+		userGroup.GET("/:uuid", v1.GetUserDetails)
+		userGroup.PUT("", v1.ModifyUserInfo)
+		userGroup.GET("/name", v1.GetUserOrGroupByName)
+		userGroup.POST("/register", v1.Register) // 注册
+		userGroup.POST("/login", v1.Login)       // 登录
 	}
 
-	// 聊天群组路由组
-	group := server.Group("/group")
+	// 聊天群路由组
+	chatGroup := server.Group("/group")
 	{
-		group.GET("/:uuid", v1.GetGroup)
-		group.POST("/:uuid", v1.SaveGroup)                     // 创建群聊
-		group.POST("/join/:userUuid/:groupUuid", v1.JoinGroup) // 加入群聊
-		group.GET("/user/:uuid", v1.GetGroupUsers)
+		chatGroup.GET("/:uuid", v1.GetGroup)
+		chatGroup.POST("/:uuid", v1.SaveGroup)                     // 创建群聊
+		chatGroup.POST("/join/:userUuid/:groupUuid", v1.JoinGroup) // 加入群聊
+		chatGroup.GET("/user/:uuid", v1.GetGroupUsers)
 		// 更换群头像 todo
+	}
+
+	// 文件路由组
+	fileGroup := server.Group("file")
+	{
+		fileGroup.POST("", v1.SaveFile)
+		fileGroup.GET("/:fileName", v1.GetFile)
 	}
 
 	group1 := server.Group("")
 	{
-		group1.GET("/user", v1.GetUserList)
-		group1.GET("/user/:uuid", v1.GetUserDetails)
-		group1.PUT("/user", v1.ModifyUserInfo)
 		group1.POST("/friend", v1.AddFriend)
 
 		group1.GET("/message", v1.GetMessage)
-
-		group1.GET("/file/:fileName", v1.GetFile)
-		// 修改这块儿的路由 一点都不清晰，都找不到是在哪里添加的头像 todo
-		group1.POST("/file", v1.SaveFile)
 
 		group1.GET("/socket.io", socket)
 	}

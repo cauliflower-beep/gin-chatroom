@@ -32,11 +32,10 @@ func main() {
 
 	log.Logger.Info("start server", log.String("start", "start web sever..."))
 
-	// 初始化路由
-	newRouter := router.NewRouter()
-
 	go server.MyServer.Start()
 
+	// 初始化路由
+	newRouter := router.NewRouter()
 	s := &http.Server{
 		Addr:           ":8888",
 		Handler:        newRouter,

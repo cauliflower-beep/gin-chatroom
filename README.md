@@ -1,10 +1,8 @@
-[TOC]
-
 
 ## go-chat
 使用Go基于WebSocket的通讯聊天软件。
 
-### 功能列表：
+### 功能列表
 * 登录注册
 * 修改头像
 * 群聊天
@@ -23,7 +21,7 @@
 * 分布式部署（通过kafka全局消息队列，统一消息传递，可以水平扩展系统）
 
 ## 后端
-[代码仓库](https://github.com/kone-net/go-chat)
+[代码仓库]([github.com](https://github.com/cauliflower-beep/gin-chatroom))
 go中协程是非常轻量级的。在每个client接入的时候，为每一个client开启一个协程，能够在单机实现更大的并发。同时go的channel，可以非常完美的解耦client接入和消息的转发等操作。
 
 通过go-chat，可以掌握channel的和Select的配合使用，ORM框架的使用，web框架Gin的使用，配置管理，日志操作，还包括proto buffer协议的使用，等一些列项目中常用的技术。
@@ -110,7 +108,7 @@ go环境的基本配置
 
 拉取后端代码
 ```shell
-git clone https://github.com/kone-net/go-chat
+git clone https://github.com/cauliflower-beep/gin-chatroom
 ```
 
 进入目录
@@ -185,7 +183,6 @@ go run cmd/main.go
 
 ### 运行前端代码
 配置React基本环境，比如nodejs
-...
 
 拉取代码
 ```shell

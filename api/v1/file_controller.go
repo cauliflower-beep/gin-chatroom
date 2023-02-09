@@ -33,7 +33,7 @@ func SaveFile(c *gin.Context) {
 	namePreffix := uuid.NewString()
 
 	userUuid := c.PostForm("uuid")
-	file, _ := c.FormFile("file") // 获取上传文件的基本信息
+	file, _ := c.FormFile("file") // 获取上传文件的基本内容
 	fileName := file.Filename
 	index := strings.LastIndex(fileName, ".")
 	suffix := fileName[index:] // 文件后缀

@@ -50,7 +50,7 @@ func (s *Server) Start() {
 	log.Logger.Info("start server", log.Any("start server", "start server..."))
 	for {
 		select {
-		case conn := <-s.Register: // 用户登录
+		case conn := <-s.Register: // 有用户接进来
 			log.Logger.Info("login", log.Any("login", "new user login in. uuid|"+conn.Name))
 			s.Clients[conn.Name] = conn
 			msg := &protocol.Message{

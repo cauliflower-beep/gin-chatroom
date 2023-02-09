@@ -49,7 +49,7 @@ func Register(c *gin.Context) {
 }
 
 // ModifyUserInfo
-//  @Description: 修改用户数据
+//  @Description: 修改用户信息
 //  @param c
 func ModifyUserInfo(c *gin.Context) {
 	var user model.User
@@ -62,9 +62,11 @@ func ModifyUserInfo(c *gin.Context) {
 	c.JSON(http.StatusOK, response.SuccessMsg(nil))
 }
 
+// GetUserDetails
+//  @Description: 获取用户基本数信息接口
+//  @param c
 func GetUserDetails(c *gin.Context) {
 	uuid := c.Param("uuid")
-
 	c.JSON(http.StatusOK, response.SuccessMsg(service.UserService.GetUserDetails(uuid)))
 }
 

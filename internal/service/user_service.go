@@ -105,19 +105,24 @@ func (u *userService) ModifyUserInfo(user *model.User) error {
 	db := pool.GetDB()
 	db.First(&queryUser, "username = ?", user.Username)
 	log.Logger.Debug("queryUser", log.Any("queryUser", queryUser))
-	var nullId int32 = 0
-	if nullId == queryUser.Id {
+	if queryUser.Id == 0 {
 		return errors.New("用户不存在")
 	}
-	
+
 	queryUser.Nickname = user.Nickname
 	queryUser.Email = user.Email
+	// 这里密码需加密保存 todo
 	queryUser.Password = user.Password
 
 	db.Save(queryUser)
 	return nil
 }
 
+// GetUserDetails
+//  @Description: 获取用户基本信息逻辑
+//  @receiver u
+//  @param uuid
+//  @return model.User
 func (u *userService) GetUserDetails(uuid string) model.User {
 	var queryUser *model.User
 	db := pool.GetDB()
@@ -147,6 +152,11 @@ func (u *userService) GetUserOrGroupByName(name string) response.SearchResponse 
 	return search
 }
 
+// GetUserList
+//  @Description: 获取所有用户
+//  @receiver u
+//  @param uuid
+//  @return []model.User
 func (u *userService) GetUserList(uuid string) []model.User {
 	db := pool.GetDB()
 

@@ -33,7 +33,7 @@ func init() {
 	//连接MYSQL, 获得DB类型实例，用于后面的数据库读写操作。
 	var err error
 	/*
-		这个坑之前怎么没有踩出来呢？源代码:
+		这个坑之前怎么没有踩出来呢?源代码:
 		_db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 			Logger: logger.Default.LogMode(logger.Info),
 		})
