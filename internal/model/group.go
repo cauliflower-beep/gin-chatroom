@@ -5,8 +5,7 @@ import (
 	"time"
 )
 
-// Group
-//  @Description: 群组结构
+// Group 群组结构
 type Group struct {
 	ID        int32                 `json:"id" gorm:"primarykey"`
 	Uuid      string                `json:"uuid" gorm:"type:varchar(150);not null;unique_index:idx_uuid;comment:'uuid'"`

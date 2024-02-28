@@ -6,10 +6,7 @@ import (
 	"regexp"
 )
 
-// IsEmail
-//  @Description: 检验邮箱格式是否符合规范
-//  @param email
-//  @return err
+// IsEmail 检验邮箱格式是否合规
 func IsEmail(email string) (err error) {
 	if strs.IsBlank(email) {
 		err = errors.New("邮箱格式不符合规范")

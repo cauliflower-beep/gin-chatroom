@@ -11,8 +11,7 @@ Gorm模型定义。
 或者查询数据表中的数据来填充结构体
 */
 
-// UserFriend
-// @Description: 好友结构
+// UserFriend 好友结构
 type UserFriend struct {
 	ID        int32                 `json:"id" gorm:"primarykey"`
 	CreatedAt time.Time             `json:"createAt"`
