@@ -15,8 +15,9 @@ import (
 )
 
 // GetFile
-//  @Description: 前端通过文件名称获取文件流，显示文件 例如登录时候获取头像
-//  @param c
+//
+//	@Description: 前端通过文件名称获取文件流，显示文件 例如登录时候获取头像
+//	@param c
 func GetFile(c *gin.Context) {
 	fileName := c.Param("fileName")
 	log.Logger.Info(fileName)
@@ -24,9 +25,7 @@ func GetFile(c *gin.Context) {
 	_, _ = c.Writer.Write(data)
 }
 
-// SaveFile
-//  @Description: 上传头像等文件 直接保存在配置中[staticPath]指向的静态文件路径
-//  @param c
+// SaveFile 上传头像等文件 直接保存在配置中[staticPath]指向的静态文件路径
 func SaveFile(c *gin.Context) {
 	conf := config.GetConfig()
 	// 文件前缀

@@ -9,9 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// GetGroup
-//  @Description: 获取群聊列表
-//  @param c
+// GetGroup 获取群聊列表
 func GetGroup(c *gin.Context) {
 	uuid := c.Param("uuid")
 	groups, err := service.GroupService.GetGroups(uuid)
@@ -22,9 +20,7 @@ func GetGroup(c *gin.Context) {
 	c.JSON(http.StatusOK, response.SuccessMsg(groups))
 }
 
-// SaveGroup
-//  @Description: 保存分组列表
-//  @param c
+// SaveGroup 保存分组列表
 func SaveGroup(c *gin.Context) {
 	uuid := c.Param("uuid")
 	var group model.Group
@@ -38,9 +34,7 @@ func SaveGroup(c *gin.Context) {
 	c.JSON(http.StatusOK, response.SuccessMsg(nil))
 }
 
-// JoinGroup
-//  @Description: 加入群聊
-//  @param c
+// JoinGroup 加入群聊
 func JoinGroup(c *gin.Context) {
 	userUuid := c.Param("userUuid")
 	groupUuid := c.Param("groupUuid")
@@ -52,9 +46,7 @@ func JoinGroup(c *gin.Context) {
 	c.JSON(http.StatusOK, response.SuccessMsg(nil))
 }
 
-// GetGroupUsers
-//  @Description: 获取群聊组内成员信息
-//  @param c
+// GetGroupUsers 获取群聊组内成员信息
 func GetGroupUsers(c *gin.Context) {
 	groupUuid := c.Param("uuid")
 	users := service.GroupService.GetUserIdByGroupUuid(groupUuid)

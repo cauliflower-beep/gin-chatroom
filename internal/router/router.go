@@ -25,12 +25,12 @@ func NewRouter() *gin.Engine {
 		- using env:   export GIN_MODE=release
 		- using code:  gin.SetMode(gin.ReleaseMode)
 	*/
-	gin.SetMode(gin.ReleaseMode)
+	//gin.SetMode(gin.ReleaseMode)
 
 	server := gin.Default()
 	server.Use(Cors())
 	server.Use(Recovery)
-	// server.Use(gin.Recovery())
+	//server.Use(gin.Recovery())
 
 	socket := RunSocket
 
@@ -73,6 +73,7 @@ func NewRouter() *gin.Engine {
 	return server
 }
 
+// Cors 自定义跨域中间件
 func Cors() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		method := c.Request.Method

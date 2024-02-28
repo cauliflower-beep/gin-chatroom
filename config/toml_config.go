@@ -17,8 +17,7 @@ type TomlConfig struct {
 	MsgChannelType MsgChannelType
 }
 
-// MySQLConfig
-// @Description: MySQL相关配置
+// MySQLConfig MySQL配置
 type MySQLConfig struct {
 	Host        string
 	Name        string
@@ -82,9 +81,10 @@ func GetConfig() TomlConfig {
 }
 
 // GetConfigLazy
-//  @Description: 懒汉模式
-//  @Description: 注意结构体判空
-//  @return TomlConfig
+//
+//	@Description: 懒汉模式
+//	@Description: 注意结构体判空
+//	@return TomlConfig
 func GetConfigLazy() TomlConfig {
 	if c == (TomlConfig{}) {
 		one.Do(func() {

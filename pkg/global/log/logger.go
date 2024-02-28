@@ -19,16 +19,16 @@ var (
 )
 
 // InitLogger
-//  @Description: 标准库的log包和zap日志库不支持日志切割
-//  然而如果每天业务产生海量日志，日志文件就会越来越大，甚至触发磁盘空间不足的报警。
-//  此时如果我们移动或者删除日志文件，需要先将业务停止写日志，很不方便。
-//  而且大日志文件也不方便查询，多少有点失去日志本身的意义。
-//	所以实际开发中，通常会按照日志文件大小或者日期进行日志切割。
-//  @param logpath
-//  @param loglevel
+//
+//	 @Description: 标准库的log包和zap日志库不支持日志切割
+//	 然而如果每天业务产生海量日志，日志文件就会越来越大，甚至触发磁盘空间不足的报警。
+//	 此时如果我们移动或者删除日志文件，需要先将业务停止写日志，很不方便。
+//	 而且大日志文件也不方便查询，多少有点失去日志本身的意义。
+//		所以实际开发中，通常会按照日志文件大小或者日期进行日志切割。
+//	 @param logpath
+//	 @param loglevel
 func InitLogger(logpath string, loglevel string) {
 	// lumberjack.Logger 是一个滚动记录器，一个控制写入日志的文件的日志组件
-	//
 	hook := lumberjack.Logger{
 		Filename:   logpath, // 日志文件路径，默认 os.TempDir()
 		MaxSize:    100,     // 每个日志文件保存100M，默认 100M

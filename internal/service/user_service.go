@@ -22,10 +22,11 @@ type userService struct {
 var UserService = new(userService)
 
 // Register
-//  @Description: 用户注册，数据保存进数据库
-//  @receiver u
-//  @param user
-//  @return error
+//
+//	@Description: 用户注册，数据保存进数据库
+//	@receiver u
+//	@param user
+//	@return error
 func (u *userService) Register(user *model.User) error {
 	db := pool.GetDB()
 	var userCount int64
@@ -76,10 +77,11 @@ func (u *userService) Register(user *model.User) error {
 }
 
 // Login
-//  @Description: 用户登录
-//  @receiver u
-//  @param user
-//  @return bool
+//
+//	@Description: 用户登录
+//	@receiver u
+//	@param user
+//	@return bool
 func (u *userService) Login(user *model.User) bool {
 	_ = pool.GetDB().AutoMigrate(&user) // 自动迁移
 	log.Logger.Debug("user", log.Any("user in service", user))
@@ -96,10 +98,11 @@ func (u *userService) Login(user *model.User) bool {
 }
 
 // ModifyUserInfo
-//  @Description: 用户信息修改逻辑
-//  @receiver u
-//  @param user
-//  @return error
+//
+//	@Description: 用户信息修改逻辑
+//	@receiver u
+//	@param user
+//	@return error
 func (u *userService) ModifyUserInfo(user *model.User) error {
 	var queryUser *model.User
 	db := pool.GetDB()
@@ -119,10 +122,11 @@ func (u *userService) ModifyUserInfo(user *model.User) error {
 }
 
 // GetUserDetails
-//  @Description: 获取用户基本信息逻辑
-//  @receiver u
-//  @param uuid
-//  @return model.User
+//
+//	@Description: 获取用户基本信息逻辑
+//	@receiver u
+//	@param uuid
+//	@return model.User
 func (u *userService) GetUserDetails(uuid string) model.User {
 	var queryUser *model.User
 	db := pool.GetDB()
@@ -130,11 +134,7 @@ func (u *userService) GetUserDetails(uuid string) model.User {
 	return *queryUser
 }
 
-// GetUserOrGroupByName
-//  @Description: 通过名称查找群组或者用户（添加好友或者群组时可用）
-//  @receiver u
-//  @param name
-//  @return response.SearchResponse
+// GetUserOrGroupByName 通过名称查找群组或者用户（添加好友或者群组时可用）
 func (u *userService) GetUserOrGroupByName(name string) response.SearchResponse {
 	var queryUser *model.User
 	db := pool.GetDB()
@@ -152,11 +152,7 @@ func (u *userService) GetUserOrGroupByName(name string) response.SearchResponse 
 	return search
 }
 
-// GetUserList
-//  @Description: 获取所有用户
-//  @receiver u
-//  @param uuid
-//  @return []model.User
+// GetUserList 获取所有用户
 func (u *userService) GetUserList(uuid string) []model.User {
 	db := pool.GetDB()
 
@@ -176,11 +172,7 @@ func (u *userService) GetUserList(uuid string) []model.User {
 	return queryUsers
 }
 
-// AddFriend
-//  @Description: 好友添加逻辑
-//  @receiver u
-//  @param userFriendRequest
-//  @return error
+// AddFriend 好友添加逻辑
 func (u *userService) AddFriend(userFriendRequest *request.FriendRequest) error {
 	var queryUser *model.User // 申请者
 	db := pool.GetDB()
@@ -235,11 +227,12 @@ func (u *userService) AddFriend(userFriendRequest *request.FriendRequest) error 
 }
 
 // ModifyUserAvatar
-//  @Description: 修改头像
-//  @receiver u
-//  @param avatar
-//  @param userUuid
-//  @return error
+//
+//	@Description: 修改头像
+//	@receiver u
+//	@param avatar
+//	@param userUuid
+//	@return error
 func (u *userService) ModifyUserAvatar(avatar string, userUuid string) error {
 	var queryUser *model.User
 	db := pool.GetDB()

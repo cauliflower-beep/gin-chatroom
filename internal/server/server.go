@@ -36,16 +36,12 @@ func NewServer() *Server {
 	}
 }
 
-// ConsumerKafkaMsg
-//  @Description: 消费kafka里面的消息, 然后直接放入go channel中统一进行消费
-//  @param data
+// ConsumerKafkaMsg 消费kafka里面的消息, 然后直接放入go channel中统一进行消费
 func ConsumerKafkaMsg(data []byte) {
 	MyServer.Broadcast <- data
 }
 
-// Start
-//  @Description: 开启服务器处理过程
-//  @receiver s
+// Start 启动服务器
 func (s *Server) Start() {
 	log.Logger.Info("start server", log.Any("start server", "start server..."))
 	for {
@@ -65,7 +61,7 @@ func (s *Server) Start() {
 			log.Logger.Info("logout", log.Any("logout. uuid|", conn.Name))
 			if _, ok := s.Clients[conn.Name]; ok {
 				close(conn.Send)
-				_ = conn.Conn.Close()        // 原代码中没有关闭连接的操作 这里要不要加? todo
+				//_ = conn.Conn.Close()        // 原代码中没有关闭连接的操作 这里要不要加? todo
 				delete(s.Clients, conn.Name) // map中删除已经离线的用户
 			}
 
@@ -76,8 +72,7 @@ func (s *Server) Start() {
 				log.Logger.Error("broadcast msg unmarshal", log.Any("err|", err))
 			}
 			if msg.To != "" {
-				// 普通消息-文本/文件/图片/语音/视频等
-				if msg.ContentType >= constant.TEXT && msg.ContentType <= constant.VIDEO {
+				if msg.ContentType >= constant.TEXT && msg.ContentType <= constant.VIDEO { // 普通消息-文本/文件/图片/语音/视频等
 					// 保存消息只会在存在socket的一个端上进行保存，防止分布式部署后，消息重复问题
 					_, exits := s.Clients[msg.From]
 					if exits {
@@ -124,10 +119,7 @@ func (s *Server) Start() {
 	}
 }
 
-// sendGroupMessage
-//  @Description: 发送给群组消息,需要查询该群所有人员依次发送
-//  @param msg
-//  @param s
+// sendGroupMessage 发送给群组消息,需要查询该群所有人员依次发送
 func sendGroupMessage(msg *protocol.Message, s *Server) {
 	// 发送给群组的消息，查找该群所有的用户进行发送
 	users := service.GroupService.GetUserIdByGroupUuid(msg.To)
@@ -162,9 +154,7 @@ func sendGroupMessage(msg *protocol.Message, s *Server) {
 	}
 }
 
-// saveMessage
-//  @Description: 保存消息，如果是文本消息直接保存; 如果是文件、语音等消息，保存文件到配置指定路径后，保存对应的文件路径
-//  @param message
+// saveMessage 保存消息，如果是文本消息直接保存; 如果是文件、语音等消息，保存文件到配置指定路径后，保存对应的文件路径
 func saveMessage(message *protocol.Message) {
 	// 如果上传的是base64字符串文件，解析文件保存
 	if message.ContentType == 2 {

@@ -12,6 +12,7 @@ require (
 	github.com/spf13/viper v1.9.0
 	github.com/wxnacy/wgo v1.0.4
 	go.uber.org/zap v1.19.1
+	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3
 	gorm.io/driver/mysql v1.1.3
 	gorm.io/gorm v1.22.2
 	gorm.io/plugin/soft_delete v1.0.4
@@ -59,7 +60,6 @@ require (
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
-	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3 // indirect
 	golang.org/x/net v0.4.0 // indirect
 	golang.org/x/sys v0.3.0 // indirect
 	golang.org/x/text v0.5.0 // indirect

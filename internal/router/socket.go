@@ -17,9 +17,7 @@ var upGrader = websocket.Upgrader{
 	},
 }
 
-// RunSocket
-//  @Description:每来一个用户，创建一个socket连接
-//  @param c
+// RunSocket 每来一个用户，创建一个socket连接
 func RunSocket(c *gin.Context) {
 	user := c.Query("user")
 	if user == "" {

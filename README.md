@@ -203,6 +203,50 @@ npm install
 
 然后重新运行 ```npm i```命令，再次安装。安装完成，没有出现报错，就可以进入下一步正常启动项目了。
 
+如果还有proxy的问题报错：
+
+```go
+...
+npm ERR! errno -4077
+npm ERR! network read ECONNRESET
+npm ERR! network This is a problem related to network connectivity.
+npm ERR! network In most cases you are behind a proxy or have bad network settings.
+npm ERR! network
+npm ERR! network If you are behind a proxy, please make sure that the
+npm ERR! network 'proxy' config is set properly.  See: 'npm help config'
+...
+```
+
+可以执行如下命令：
+
+```js
+npm config set proxy false
+
+npm cache verify
+
+npm install
+```
+
+如果出现证书过期的问题：
+
+```go
+...
+npm ERR! code CERT_HAS_EXPIRED
+npm ERR! errno CERT_HAS_EXPIRED
+npm ERR! request to https://registry.npm.taobao.org/semver/download/semver-7.3.5.tgz?cache=0&sync_timestamp=1616463540350&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fsemver%2Fdownload%2Fsemver-7.3.5.tgz failed, reason: certificate has expired
+...
+```
+
+可以执行如下命令来解决：
+
+```go
+npm cache clean --force
+
+npm config set strict-ssl false
+
+npm install
+```
+
 如果后端地址或者端口号需要修改
 ```shell
 修改src/chat/common/param/Params.jsx里面的IP_PORT
@@ -223,7 +267,29 @@ npm start
 http://127.0.0.1:3000/login
 ```
 
+如果运行失败，出现了类似如下的问题：
+```go
+...
+opensslErrorStack: [ 'error:03000086:digital envelope routines::initialization error' ],
+  library: 'digital envelope routines',
+  reason: 'unsupported',
+  code: 'ERR_OSSL_EVP_UNSUPPORTED'
+...
+```
+
+可以打开package.json，补充如下内容：
+
+```json
+...
+"scripts": {
+    "start": "set NODE_OPTIONS=--openssl-legacy-provider && react-scripts start",
+    ...
+  },
+...    
+```
+
 ### 分布式部署
+
 * 拉取代码
 将代码拉取到服务器，运行make build构建后端代码。
 * 构建后端服务镜像
